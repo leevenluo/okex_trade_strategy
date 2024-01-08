@@ -1,0 +1,147 @@
+2024-1-8 19:18:28|oker-project/okerapi.GetInstruments|instruments.go|79|DEBUG|GetInstruments SWAP: 116
+2024-1-8 19:18:29|oker-project/okerapi.GetMarketTickers|market_tickers.go|87|DEBUG|len productList :%!(EXTRA int=83)
+2024-1-8 19:18:29|oker-project/okerapi.CheckAccountPositions|account_position.go|81|DEBUG|len(accountPositionRsp.Data) < 1: 0
+2024-1-8 19:18:29|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.370000, D: -0.020000, K*n1: 0.259000, D >= K*n1: false
+2024-1-8 19:18:29|main.main|main.go|93|DEBUG|ETC-USDT-SWAP order: false
+2024-1-8 19:18:31|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.002380, D: -0.000250, K*n1: 0.001666, D >= K*n1: false
+2024-1-8 19:18:31|main.main|main.go|93|DEBUG|CETUS-USDT-SWAP order: false
+2024-1-8 19:18:33|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.031000, D: 0.000500, K*n1: 0.021700, D >= K*n1: false
+2024-1-8 19:18:33|main.main|main.go|93|DEBUG|SUSHI-USDT-SWAP order: false
+2024-1-8 19:18:34|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.010200, D: -0.000300, K*n1: 0.007140, D >= K*n1: false
+2024-1-8 19:18:34|main.main|main.go|93|DEBUG|CRV-USDT-SWAP order: false
+2024-1-8 19:18:36|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001800, D: 0.000000, K*n1: 0.001260, D >= K*n1: false
+2024-1-8 19:18:36|main.main|main.go|93|DEBUG|XLM-USDT-SWAP order: false
+2024-1-8 19:18:38|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000000, D: 0.000000, K*n1: 0.000000, D >= K*n1: true
+2024-1-8 19:18:38|oker-project/okerapi.CalcOrderCounts|strategy.go|54|DEBUG|K: 0.000000, counts: +Inf, orderCounts: +Inf
+2024-1-8 19:18:38|oker-project/okerapi.TradeOrder|trade_order.go|165|DEBUG|trade order success: 664548539984371713
+2024-1-8 19:18:39|oker-project/okerapi.GetOrderInfoOfAvgPx|trade_order.go|274|DEBUG|all order finish: 0.2747
+2024-1-8 19:18:39|oker-project/okerapi.CalcSLOrderPx|strategy.go|74|DEBUG|K: 0.000000, orderSLPx: 0.274700, orderSLPx: 0
+2024-1-8 19:18:39|oker-project/okerapi.TradeSLOrder|trade_order.go|341|DEBUG|orderAlgoRsp err, code: 51250, msg: Bot order price is out of the available range
+2024-1-8 19:18:39|main.main|main.go|84|DEBUG|okerapi.TradeSLOrder err: 121
+2024-1-8 19:18:40|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.024900, D: -0.004500, K*n1: 0.017430, D >= K*n1: false
+2024-1-8 19:18:40|main.main|main.go|93|DEBUG|THETA-USDT-SWAP order: false
+2024-1-8 19:18:41|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001630, D: -0.000340, K*n1: 0.001141, D >= K*n1: false
+2024-1-8 19:18:41|main.main|main.go|93|DEBUG|CRO-USDT-SWAP order: false
+2024-1-8 19:18:43|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 1.140000, D: -0.100000, K*n1: 0.798000, D >= K*n1: false
+2024-1-8 19:18:43|main.main|main.go|93|DEBUG|LTC-USDT-SWAP order: false
+2024-1-8 19:18:45|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.132000, D: -0.006000, K*n1: 0.092400, D >= K*n1: false
+2024-1-8 19:18:45|main.main|main.go|93|DEBUG|UNI-USDT-SWAP order: false
+2024-1-8 19:18:46|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 22.297000, D: 0.000000, K*n1: 15.607900, D >= K*n1: false
+2024-1-8 19:18:46|main.main|main.go|93|DEBUG|INJ-USDT-SWAP order: false
+2024-1-8 19:18:48|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000184, D: -0.000017, K*n1: 0.000129, D >= K*n1: false
+2024-1-8 19:18:48|main.main|main.go|93|DEBUG|IOST-USDT-SWAP order: false
+2024-1-8 19:18:50|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 806.100000, D: -192.600000, K*n1: 564.270000, D >= K*n1: false
+2024-1-8 19:18:50|main.main|main.go|93|DEBUG|BTC-USDT-SWAP order: false
+2024-1-8 19:18:51|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 3.500000, D: -1.000000, K*n1: 2.450000, D >= K*n1: false
+2024-1-8 19:18:51|main.main|main.go|93|DEBUG|BNB-USDT-SWAP order: false
+2024-1-8 19:18:53|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.190000, D: -0.038000, K*n1: 0.133000, D >= K*n1: false
+2024-1-8 19:18:53|main.main|main.go|93|DEBUG|APT-USDT-SWAP order: false
+2024-1-8 19:18:55|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.291000, D: -0.070000, K*n1: 0.203700, D >= K*n1: false
+2024-1-8 19:18:55|main.main|main.go|93|DEBUG|NEO-USDT-SWAP order: false
+2024-1-8 19:18:57|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 1.164000, D: -0.306000, K*n1: 0.814800, D >= K*n1: false
+2024-1-8 19:18:57|main.main|main.go|93|DEBUG|AVAX-USDT-SWAP order: false
+2024-1-8 19:18:58|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.185000, D: -0.047000, K*n1: 0.129500, D >= K*n1: false
+2024-1-8 19:18:58|main.main|main.go|93|DEBUG|LPT-USDT-SWAP order: false
+2024-1-8 19:19:0|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.014200, D: -0.004500, K*n1: 0.009940, D >= K*n1: false
+2024-1-8 19:19:0|main.main|main.go|93|DEBUG|KNC-USDT-SWAP order: false
+2024-1-8 19:19:2|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000720, D: 0.000000, K*n1: 0.000504, D >= K*n1: false
+2024-1-8 19:19:2|main.main|main.go|93|DEBUG|ORBS-USDT-SWAP order: false
+2024-1-8 19:19:3|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.366000, D: -0.077000, K*n1: 0.256200, D >= K*n1: false
+2024-1-8 19:19:3|main.main|main.go|93|DEBUG|LINK-USDT-SWAP order: false
+2024-1-8 19:19:5|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000001, D: -0.000000, K*n1: 0.000001, D >= K*n1: false
+2024-1-8 19:19:5|main.main|main.go|93|DEBUG|FLOKI-USDT-SWAP order: false
+2024-1-8 19:19:7|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001550, D: -0.000350, K*n1: 0.001085, D >= K*n1: false
+2024-1-8 19:19:7|main.main|main.go|93|DEBUG|DOGE-USDT-SWAP order: false
+2024-1-8 19:19:9|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 1.280000, D: -0.300000, K*n1: 0.896000, D >= K*n1: false
+2024-1-8 19:19:9|main.main|main.go|93|DEBUG|COMP-USDT-SWAP order: false
+2024-1-8 19:19:10|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000136, D: 0.000000, K*n1: 0.000095, D >= K*n1: false
+2024-1-8 19:19:10|main.main|main.go|93|DEBUG|VRA-USDT-SWAP order: false
+2024-1-8 19:19:12|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 51.500000, D: -10.300000, K*n1: 36.050000, D >= K*n1: false
+2024-1-8 19:19:12|main.main|main.go|93|DEBUG|MKR-USDT-SWAP order: false
+2024-1-8 19:19:14|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.004200, D: 0.000000, K*n1: 0.002940, D >= K*n1: false
+2024-1-8 19:19:14|main.main|main.go|93|DEBUG|GRT-USDT-SWAP order: false
+2024-1-8 19:19:15|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.192000, D: -0.009000, K*n1: 0.134400, D >= K*n1: false
+2024-1-8 19:19:15|main.main|main.go|93|DEBUG|FIL-USDT-SWAP order: false
+2024-1-8 19:19:17|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.870000, D: -0.263000, K*n1: 0.609000, D >= K*n1: false
+2024-1-8 19:19:17|main.main|main.go|93|DEBUG|AUCTION-USDT-SWAP order: false
+2024-1-8 19:19:19|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 30.470000, D: -6.950000, K*n1: 21.329000, D >= K*n1: false
+2024-1-8 19:19:19|main.main|main.go|93|DEBUG|ETH-USDT-SWAP order: false
+2024-1-8 19:19:20|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000000, D: -0.000000, K*n1: 0.000000, D >= K*n1: false
+2024-1-8 19:19:20|main.main|main.go|93|DEBUG|SHIB-USDT-SWAP order: false
+2024-1-8 19:19:22|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.710400, D: 0.000000, K*n1: 0.497280, D >= K*n1: false
+2024-1-8 19:19:22|main.main|main.go|93|DEBUG|ARB-USDT-SWAP order: false
+2024-1-8 19:19:24|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.042900, D: -0.003100, K*n1: 0.030030, D >= K*n1: false
+2024-1-8 19:19:24|main.main|main.go|93|DEBUG|MINA-USDT-SWAP order: false
+2024-1-8 19:19:26|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.043200, D: -0.006900, K*n1: 0.030240, D >= K*n1: false
+2024-1-8 19:19:26|main.main|main.go|93|DEBUG|IMX-USDT-SWAP order: false
+2024-1-8 19:19:27|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.023400, D: -0.006200, K*n1: 0.016380, D >= K*n1: false
+2024-1-8 19:19:27|main.main|main.go|93|DEBUG|SUI-USDT-SWAP order: false
+2024-1-8 19:19:29|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.025300, D: -0.004800, K*n1: 0.017710, D >= K*n1: false
+2024-1-8 19:19:29|main.main|main.go|93|DEBUG|XTZ-USDT-SWAP order: false
+2024-1-8 19:19:31|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.015300, D: -0.004000, K*n1: 0.010710, D >= K*n1: false
+2024-1-8 19:19:31|main.main|main.go|93|DEBUG|EOS-USDT-SWAP order: false
+2024-1-8 19:19:32|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000000, D: -0.000000, K*n1: 0.000000, D >= K*n1: false
+2024-1-8 19:19:32|main.main|main.go|93|DEBUG|PEPE-USDT-SWAP order: false
+2024-1-8 19:19:34|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.005500, D: -0.001500, K*n1: 0.003850, D >= K*n1: false
+2024-1-8 19:19:34|main.main|main.go|93|DEBUG|LRC-USDT-SWAP order: false
+2024-1-8 19:19:36|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.105800, D: -0.020500, K*n1: 0.074060, D >= K*n1: false
+2024-1-8 19:19:36|main.main|main.go|93|DEBUG|OP-USDT-SWAP order: false
+2024-1-8 19:19:37|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001020, D: -0.000120, K*n1: 0.000714, D >= K*n1: false
+2024-1-8 19:19:37|main.main|main.go|93|DEBUG|GFT-USDT-SWAP order: false
+2024-1-8 19:19:39|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.000000, D: 0.000000, K*n1: 0.000000, D >= K*n1: false
+2024-1-8 19:19:39|main.main|main.go|93|DEBUG|KISHU-USDT-SWAP order: false
+2024-1-8 19:19:41|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 5.000000, D: -1.500000, K*n1: 3.500000, D >= K*n1: false
+2024-1-8 19:19:41|main.main|main.go|93|DEBUG|BCH-USDT-SWAP order: false
+2024-1-8 19:19:42|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.128000, D: -0.015000, K*n1: 0.089600, D >= K*n1: false
+2024-1-8 19:19:42|main.main|main.go|93|DEBUG|ETHW-USDT-SWAP order: false
+2024-1-8 19:19:44|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.180000, D: -0.040000, K*n1: 0.126000, D >= K*n1: false
+2024-1-8 19:19:44|main.main|main.go|93|DEBUG|ATOM-USDT-SWAP order: false
+2024-1-8 19:19:46|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.067900, D: 0.000000, K*n1: 0.047530, D >= K*n1: false
+2024-1-8 19:19:46|main.main|main.go|93|DEBUG|YGG-USDT-SWAP order: false
+2024-1-8 19:19:48|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 1.220000, D: -0.460000, K*n1: 0.854000, D >= K*n1: false
+2024-1-8 19:19:48|main.main|main.go|93|DEBUG|AAVE-USDT-SWAP order: false
+2024-1-8 19:19:49|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.008400, D: -0.000800, K*n1: 0.005880, D >= K*n1: false
+2024-1-8 19:19:49|main.main|main.go|93|DEBUG|ALGO-USDT-SWAP order: false
+2024-1-8 19:19:51|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.012200, D: -0.002600, K*n1: 0.008540, D >= K*n1: false
+2024-1-8 19:19:51|main.main|main.go|93|DEBUG|ADA-USDT-SWAP order: false
+2024-1-8 19:19:53|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.011500, D: -0.002100, K*n1: 0.008050, D >= K*n1: false
+2024-1-8 19:19:53|main.main|main.go|93|DEBUG|SAND-USDT-SWAP order: false
+2024-1-8 19:19:54|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001500, D: -0.000190, K*n1: 0.001050, D >= K*n1: false
+2024-1-8 19:19:54|main.main|main.go|93|DEBUG|TRX-USDT-SWAP order: false
+2024-1-8 19:19:56|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.027600, D: -0.001100, K*n1: 0.019320, D >= K*n1: false
+2024-1-8 19:19:56|main.main|main.go|93|DEBUG|CELO-USDT-SWAP order: false
+2024-1-8 19:19:58|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.017700, D: -0.003800, K*n1: 0.012390, D >= K*n1: false
+2024-1-8 19:19:58|main.main|main.go|93|DEBUG|OMG-USDT-SWAP order: false
+2024-1-8 19:19:59|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.021900, D: 0.000500, K*n1: 0.015330, D >= K*n1: false
+2024-1-8 19:19:59|main.main|main.go|93|DEBUG|FLOW-USDT-SWAP order: false
+2024-1-8 19:20:1|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 1.542000, D: -0.246000, K*n1: 1.079400, D >= K*n1: false
+2024-1-8 19:20:1|main.main|main.go|93|DEBUG|ICP-USDT-SWAP order: false
+2024-1-8 19:20:3|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.051000, D: -0.009000, K*n1: 0.035700, D >= K*n1: false
+2024-1-8 19:20:3|main.main|main.go|93|DEBUG|BAND-USDT-SWAP order: false
+2024-1-8 19:20:5|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.091000, D: -0.023000, K*n1: 0.063700, D >= K*n1: false
+2024-1-8 19:20:5|main.main|main.go|93|DEBUG|LDO-USDT-SWAP order: false
+2024-1-8 19:20:6|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.071000, D: -0.010000, K*n1: 0.049700, D >= K*n1: false
+2024-1-8 19:20:6|main.main|main.go|93|DEBUG|QTUM-USDT-SWAP order: false
+2024-1-8 19:20:8|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 147.000000, D: -40.000000, K*n1: 102.900000, D >= K*n1: false
+2024-1-8 19:20:8|main.main|main.go|93|DEBUG|YFI-USDT-SWAP order: false
+2024-1-8 19:20:10|oker-project/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.012400, D: -0.001900, K*n1: 0.008680, D >= K*n1: false
+2024-1-8 19:20:10|main.main|main.go|93|DEBUG|1INCH-USDT-SWAP order: false
+2024-1-8 23:58:39|trade_strategy/okerapi.GetInstruments|instruments.go|79|DEBUG|GetInstruments SWAP: 116
+2024-1-8 23:58:39|trade_strategy/okerapi.GetMarketTickers|market_tickers.go|87|DEBUG|len productList :%!(EXTRA int=83)
+2024-1-8 23:58:39|trade_strategy/okerapi.CheckAccountPositions|account_position.go|81|DEBUG|len(accountPositionRsp.Data) < 1: 0
+2024-1-8 23:58:40|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.340000, D: -0.010000, K*n1: 0.238000, D >= K*n1: false
+2024-1-8 23:58:40|main.main|main.go|93|DEBUG|ETC-USDT-SWAP order: false
+2024-1-8 23:58:42|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.003630, D: 0.000520, K*n1: 0.002541, D >= K*n1: false
+2024-1-8 23:58:42|main.main|main.go|93|DEBUG|CETUS-USDT-SWAP order: false
+2024-1-8 23:58:44|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.032100, D: 0.002300, K*n1: 0.022470, D >= K*n1: false
+2024-1-8 23:58:44|main.main|main.go|93|DEBUG|SUSHI-USDT-SWAP order: false
+2024-1-8 23:58:46|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.010600, D: 0.000700, K*n1: 0.007420, D >= K*n1: false
+2024-1-8 23:58:46|main.main|main.go|93|DEBUG|CRV-USDT-SWAP order: false
+2024-1-8 23:58:47|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001100, D: 0.000000, K*n1: 0.000770, D >= K*n1: false
+2024-1-8 23:58:47|main.main|main.go|93|DEBUG|XLM-USDT-SWAP order: false
+2024-1-8 23:58:49|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.001100, D: 0.000000, K*n1: 0.000770, D >= K*n1: false
+2024-1-8 23:58:49|main.main|main.go|93|DEBUG|ID-USDT-SWAP order: false
+2024-1-8 23:58:51|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.024400, D: 0.002800, K*n1: 0.017080, D >= K*n1: false
+2024-1-8 23:58:51|main.main|main.go|93|DEBUG|THETA-USDT-SWAP order: false
+2024-1-8 23:58:52|trade_strategy/okerapi.JudgeOrderCondition|strategy.go|24|DEBUG|K: 0.004120, D: -0.000160, K*n1: 0.002884, D >= K*n1: false
+2024-1-8 23:58:52|main.main|main.go|93|DEBUG|CRO-USDT-SWAP order: false
