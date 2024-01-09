@@ -9,80 +9,38 @@ import (
 	"trade_strategy/internal"
 )
 
-type CloseOrderAlgo struct {
-	AlgoId string `json:"algoId"`
-}
-
-type AccountPosition struct {
-	InstId             string           `json:"instId"`
-	AvgPx              string           `json:"avgPx"`
-	CloseOrderAlgoList []CloseOrderAlgo `json:"closeOrderAlgo"`
-}
-
-type AccountPositionRsp struct {
-	Code string            `json:"code"`
-	Msg  string            `json:"msg"`
-	Data []AccountPosition `json:"data"`
-}
-
 // 针对已经建仓产品，定时轮询
 func CheckAccountPositions() {
 	// 初始化启动时间戳，为当天0点unix时间戳
-	var last_time int64
-	last_time, ret := internal.InitZeroTimestamp()
-	if ret != internal.RETURN_SUCCESS {
-		logInfo := fmt.Sprintf("internal.InitZeroTimestamp err: %s", ret)
-		internal.PrintDebugLogToFile(logInfo)
-		return
-	}
+	// var last_time int64
+	// last_time, ret := internal.InitZeroTimestamp()
+	// if ret != internal.RETURN_SUCCESS {
+	// 	logInfo := fmt.Sprintf("internal.InitZeroTimestamp err: %s", ret)
+	// 	internal.PrintDebugLogToFile(logInfo)
+	// 	return
+	// }
 
-	firstRun := true
-	var interval int64 = 30
+	// firstRun := true
+	// var interval int64 = 30
 
 	for true {
-
-		req, _ := http.NewRequest("GET", internal.ROOT_PATH, nil)
-		accountPostionPath := "/api/v5/account/positions"
-
-		req.URL.Path = accountPostionPath
-		request_url := req.URL.Query()
-		request_url.Add("instType", "SWAP")
-		req.URL.RawQuery = request_url.Encode()
-
-		pathUrl := accountPostionPath + "?" + req.URL.RawQuery
-		req = internal.InitUserEnv(pathUrl)
-		req.URL.Path = accountPostionPath
-		req.URL.RawQuery = request_url.Encode()
-
-		client := &http.Client{}
-		resp, _ := client.Do(req)
-
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-
-		fmt.Println(string(body))
-		var accountPositionRsp AccountPositionRsp
-		err := json.Unmarshal(body, &accountPositionRsp)
-		if err != nil {
-			logInfo := fmt.Sprintf("CheckAccountPositions Unmarshal err: %s", err.Error())
+		// 拉取持仓信息
+		accountPositionList, ret := GetAccountPosition()
+		if ret != internal.RETURN_SUCCESS {
+			logInfo := fmt.Sprintf("GetAccountPosition err: %s", ret)
 			internal.PrintDebugLogToFile(logInfo)
-			return
+			continue
 		}
 
-		if accountPositionRsp.Code != internal.RETURN_SUCCESS {
-			logInfo := fmt.Sprintf("CheckAccountPositions err, code: %s, msg: %s", accountPositionRsp.Code, accountPositionRsp.Msg)
-			internal.PrintDebugLogToFile(logInfo)
-			return
-		}
+		// 遍历持仓产品
+		for _, eachCase := range accountPositionList {
+			// 产品没有止损单，打印异常信息后退出
+			if len(eachCase.CloseOrderAlgoList) < 1 {
+				logInfo := fmt.Sprintf("No CloseOrderAlgoList err: %s", eachCase.InstId)
+				internal.PrintDebugLogToFile(logInfo)
+				continue
+			}
 
-		// 开仓数量逻辑上和止损策略单数量一样，不过考虑非事务一致关系，只对不一致的产品做日志输出
-		if len(accountPositionRsp.Data) < 1 {
-			logInfo := fmt.Sprintf("len(accountPositionRsp.Data) < 1: %d", len(accountPositionRsp.Data))
-			internal.PrintDebugLogToFile(logInfo)
-			return
-		}
-
-		for _, eachCase := range accountPositionRsp.Data {
 			// 有止损单，判断当前行情是否需要调整止损单价格
 			status, newSLPrice, ret := CheckAdjustSLPrice(eachCase)
 			if ret != internal.RETURN_SUCCESS {
@@ -120,31 +78,96 @@ func CheckAccountPositions() {
 					internal.PrintDebugLogToFile(logInfo)
 					continue
 				}
-			}
-		}
 
-		logInfo := fmt.Sprintf("len(Data):%d, len(CloseOrderAlgoList): %d",
-			len(accountPositionRsp.Data), len(accountPositionRsp.Data[0].CloseOrderAlgoList))
-		internal.PrintDebugLogToFile(logInfo)
+				// 计算盈亏金额
+				// ret = CalcTradeResult()
+			}
+
+
+			time.Sleep(1 * time.Second)
+		}
 
 		// 周期判断轮询
-		for true {
-			var status bool
-			status, err = internal.TimeIntervalSuccess(&last_time, interval, 2)
-			if firstRun {
-				time.Sleep(60 * time.Second)
-				firstRun = false
-			} else {
-				if status {
-					break
-				} else {
-					logInfo := fmt.Sprintf("market ticker period interval check, interval(s) =", interval)
-					internal.PrintDebugLogToFile(logInfo)
-				}
-				time.Sleep(100 * time.Second)
-			}
-		}
+		// for true {
+		// 	var status bool
+		// 	status, err = internal.TimeIntervalSuccess(&last_time, interval, 2)
+		// 	if firstRun {
+		// 		time.Sleep(60 * time.Second)
+		// 		firstRun = false
+		// 	} else {
+		// 		if status {
+		// 			break
+		// 		} else {
+		// 			logInfo := fmt.Sprintf("market ticker period interval check, interval(s) =", interval)
+		// 			internal.PrintDebugLogToFile(logInfo)
+		// 		}
+		// 		time.Sleep(100 * time.Second)
+		// 	}
+		// }
 	}
+}
+
+type CloseOrderAlgo struct {
+	AlgoId string `json:"algoId"`
+}
+
+type AccountPosition struct {
+	InstId             string           `json:"instId"`
+	AvgPx              string           `json:"avgPx"`
+	CloseOrderAlgoList []CloseOrderAlgo `json:"closeOrderAlgo"`
+}
+
+type AccountPositionRsp struct {
+	Code string            `json:"code"`
+	Msg  string            `json:"msg"`
+	Data []AccountPosition `json:"data"`
+}
+
+func GetAccountPosition() ([]AccountPosition, string) {
+	var accountPositionList []AccountPosition
+	req, _ := http.NewRequest("GET", internal.ROOT_PATH, nil)
+	accountPostionPath := "/api/v5/account/positions"
+
+	req.URL.Path = accountPostionPath
+	request_url := req.URL.Query()
+	request_url.Add("instType", "SWAP")
+	req.URL.RawQuery = request_url.Encode()
+
+	pathUrl := accountPostionPath + "?" + req.URL.RawQuery
+	req = internal.InitUserEnv(pathUrl)
+	req.URL.Path = accountPostionPath
+	req.URL.RawQuery = request_url.Encode()
+
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	// fmt.Println(string(body))
+	var accountPositionRsp AccountPositionRsp
+	err := json.Unmarshal(body, &accountPositionRsp)
+	if err != nil {
+		logInfo := fmt.Sprintf("CheckAccountPositions Unmarshal err: %s", err.Error())
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionList, internal.GET_ACCOUNT_POSITION_UNMARSHAL_RSP_ERROR
+	}
+
+	if accountPositionRsp.Code != internal.RETURN_SUCCESS {
+		logInfo := fmt.Sprintf("CheckAccountPositions err, code: %s, msg: %s", accountPositionRsp.Code, accountPositionRsp.Msg)
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionList, internal.GET_ACCOUNT_POSITION_POST_RSP_ERROR
+	}
+
+	// 开仓数量逻辑上和止损策略单数量一样，不过考虑非事务一致关系，只对不一致的产品做日志输出
+	if len(accountPositionRsp.Data) < 1 {
+		logInfo := fmt.Sprintf("len(accountPositionRsp.Data) < 1: %d", len(accountPositionRsp.Data))
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionList, internal.GET_ACCOUNT_POSITION_POST_DATA_ERROR
+	}
+
+	accountPositionList = accountPositionRsp.Data
+	return accountPositionList, internal.RETURN_SUCCESS
 }
 
 func CheckAdjustSLPrice(accountPosition AccountPosition) (bool, string, string) {
@@ -238,6 +261,10 @@ func AdjustSLPrice(accountPosition AccountPosition, newSLPrice string) string {
 
 	logInfo := fmt.Sprintf("AdjustSLPrice success: %s", amendAlgoRsp.Data[0].AlgoId)
 	internal.PrintDebugLogToFile(logInfo)
+
+	logTradeInfo := fmt.Sprintf("%s|%s|ADJUST SELL LONG SUCCESS", amendAlgoReq.InstId, amendAlgoRsp.Data[0].AlgoId)
+	internal.PrintTradeLogToFile(logTradeInfo)
+
 	return internal.RETURN_SUCCESS
 }
 
@@ -317,5 +344,9 @@ func ClosePosition(accountPosition AccountPosition) string {
 
 	logInfo := fmt.Sprintf("ClosePosition success: %s", closePositionRsp.Data[0].InstId)
 	internal.PrintDebugLogToFile(logInfo)
+
+	logTradeInfo := fmt.Sprintf("%s|%s|CLOSE POSITION SUCCESS", closePositionReq.InstId, closePositionRsp.Data[0].PosSide)
+	internal.PrintTradeLogToFile(logTradeInfo)
+
 	return internal.RETURN_SUCCESS
 }

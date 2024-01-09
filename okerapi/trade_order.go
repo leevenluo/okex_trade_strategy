@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"trade_strategy/internal"
 )
 
@@ -32,70 +31,6 @@ type TradeOrderReq struct {
 	OrdType string `json:"ordType"`
 	Sz      string `json:"sz"`
 	Px      string `json:"px"`
-}
-
-type TickerClosePositionReq struct {
-	InstId  string `json:"instId"`
-	UgnMode string `json:"mgnMode"`
-	Ccy     string `json:"ccy"`
-	PosSide string `json:"posSide"`
-}
-
-type TickerClosePositionItem struct {
-	InstId  string `json:"instId"`
-	PosSide string `json:"posSide"`
-}
-
-type TickerClosePositionRsp struct {
-	Code string                    `json:"code"`
-	Msg  string                    `json:"msg"`
-	Data []TickerClosePositionItem `json:"data"`
-}
-
-// TickerClosePosition order_type 1是现货买单，2是期货买单
-func TickerClosePosition(instid string, order_type string) (err error) {
-
-	// body json 构造
-	order_req := new(TickerClosePositionReq)
-	order_req.InstId = instid
-	order_req.UgnMode = "cross"
-
-	if order_type == "MARGIN" {
-		order_req.PosSide = "net"
-		order_req.Ccy = "USDT"
-	} else if order_type == "SWAP" {
-		order_req.PosSide = "short"
-	} else {
-		fmt.Println("order_type undefined:", order_type)
-		return err
-	}
-
-	reqBodyByte, err := json.Marshal(order_req)
-	req, err := internal.InitUserEnvPost("/api/v5/trade/close-position", string(reqBodyByte))
-	req.URL.Path = "/api/v5/trade/close-position"
-	fmt.Println(string(reqBodyByte))
-
-	client := &http.Client{}
-	resp, _ := client.Do(req)
-
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	fmt.Println(string(body))
-	var trade_rsp TickerClosePositionRsp
-	err = json.Unmarshal(body, &trade_rsp)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if trade_rsp.Code == "0" {
-		for _, order := range trade_rsp.Data {
-			fmt.Println(order.InstId, order.PosSide, " order success")
-		}
-	}
-
-	return err
 }
 
 // TradeOrder order_type 1是现货买单，2是期货买单
@@ -164,39 +99,10 @@ func TradeOrder(instid string, orderType string, orderSz string) (string, string
 	logInfo := fmt.Sprintf("trade order success: %s", ordId)
 	internal.PrintDebugLogToFile(logInfo)
 
+	logTradeInfo := fmt.Sprintf("%s|%s|BUY LONG SUCCESS", instid, ordId)
+	internal.PrintTradeLogToFile(logTradeInfo)
+
 	return ordId, internal.RETURN_SUCCESS
-}
-
-// TickersTradeOrder 交易接口
-func TickersTradeOrder(
-	instid string,
-	instrument map[string]*InstrumentsDetail,
-	last_spot_price string) (err error) {
-
-	inst_swap_id := instid
-	instid_array := strings.Split(inst_swap_id, "-")
-	inst_spot_id := instid_array[0] + "-USDT"
-
-	_, spot_ok := instrument[inst_spot_id]
-	_, swap_ok := instrument[inst_swap_id]
-	if spot_ok && swap_ok {
-		spot_min_sz := instrument[inst_spot_id].MinSz
-		swap_min_sz := instrument[inst_swap_id].MinSz
-		fmt.Println("instrument find success", spot_min_sz, swap_min_sz)
-
-		// 按照合约价格计算币币数量,合约价格默认60u,现货对应60u价格
-		// 市价单，sz参数对应usdt的价格；限价单，sz参数对应币种价格
-		if swap_min_sz == "1" {
-			fmt.Println("instrument min sz == 1")
-			// 同时提交现货和期货的买单
-			TradeOrder(inst_spot_id, "1", "60")
-			TradeOrder(inst_swap_id, "2", swap_min_sz)
-		}
-	} else {
-		fmt.Println(inst_spot_id, spot_ok, inst_swap_id, swap_ok)
-	}
-
-	return err
 }
 
 type OrderDetailReq struct {
@@ -219,7 +125,7 @@ type OrderDetailRsp struct {
 func GetOrderInfoOfAvgPx(instId string, ordId string) (string, string) {
 	var avgPx string
 
-	req, _ := http.NewRequest("GET", "https://www.okex.com", nil)
+	req, _ := http.NewRequest("GET", internal.ROOT_PATH, nil)
 	req.URL.RawQuery = ""
 	req.URL.Path = "/api/v5/trade/order"
 	request_url := req.URL.Query()
@@ -350,6 +256,9 @@ func TradeSLOrder(instid string, orderPrice string, orderCounts string) string {
 
 	logInfo := fmt.Sprintf("trade sl order success: %s", orderAlgoRsp.Data[0].AlgoId)
 	internal.PrintDebugLogToFile(logInfo)
+
+	logTradeInfo := fmt.Sprintf("%s|%s|SELL LONG SUCCESS", instid, orderAlgoRsp.Data[0].AlgoId)
+	internal.PrintTradeLogToFile(logTradeInfo)
 
 	return internal.RETURN_SUCCESS
 }

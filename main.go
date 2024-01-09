@@ -9,21 +9,21 @@ import (
 
 func main() {
 
-	var err error
-	var interval int64 = 10
-	firstRun := true
+	// var err error
+	// var interval int64 = 10
+	// firstRun := true
 
 	// 初始化用户参数和http请求头
 	req := internal.InitUserEnv("")
 
 	// 初始化启动时间戳，为当天0点unix时间戳
-	var last_time int64
-	last_time, ret := internal.InitZeroTimestamp()
-	if ret != internal.RETURN_SUCCESS {
-		logInfo := fmt.Sprintf("internal.InitZeroTimestamp err: %s", ret)
-		internal.PrintDebugLogToFile(logInfo)
-		return
-	}
+	// var last_time int64
+	// last_time, ret := internal.InitZeroTimestamp()
+	// if ret != internal.RETURN_SUCCESS {
+	// 	logInfo := fmt.Sprintf("internal.InitZeroTimestamp err: %s", ret)
+	// 	internal.PrintDebugLogToFile(logInfo)
+	// 	return
+	// }
 
 	// 可交易产品的信息列表
 	instrument := make(map[string]*okerapi.InstrumentsDetail)
@@ -35,7 +35,7 @@ func main() {
 	// 定时轮询符合条件的产品列表
 	for true {
 		// 获取所有资产产品信息
-		product_list, ret := okerapi.GetMarketTickers(req)
+		productList, ret := okerapi.GetMarketTickers(req)
 		if ret != internal.RETURN_SUCCESS {
 			// 获取异常
 			logInfo := fmt.Sprintf("okerapi.GetMarketTickers err: %s", ret)
@@ -43,12 +43,12 @@ func main() {
 			return
 		}
 
-		for _, eachInstId := range product_list {
-
+		// 遍历每个产品确认交易逻辑
+		for _, eachInstId := range productList {
 			// 获取产品对应的K线
 			getCandlesResult, ret := okerapi.GetCandles(eachInstId.InstId)
 			if ret != internal.RETURN_SUCCESS {
-				logInfo := fmt.Sprintf("okerapi.GetCandles error: %s", err.Error())
+				logInfo := fmt.Sprintf("okerapi.GetCandles error: %s", ret)
 				internal.PrintDebugLogToFile(logInfo)
 				return
 			}
@@ -97,21 +97,21 @@ func main() {
 		}
 
 		// 周期判断轮询
-		for true {
-			var status bool
-			status, err = internal.TimeIntervalSuccess(&last_time, interval, 2)
-			if firstRun {
-				time.Sleep(60 * time.Second)
-				firstRun = false
-			} else {
-				if status {
-					break
-				} else {
-					logInfo := fmt.Sprintf("market ticker period interval check, interval(s) =", interval)
-					internal.PrintDebugLogToFile(logInfo)
-				}
-				time.Sleep(100 * time.Second)
-			}
-		}
+		// for true {
+		// 	var status bool
+		// 	status, err = internal.TimeIntervalSuccess(&last_time, interval, 2)
+		// 	if firstRun {
+		// 		time.Sleep(60 * time.Second)
+		// 		firstRun = false
+		// 	} else {
+		// 		if status {
+		// 			break
+		// 		} else {
+		// 			logInfo := fmt.Sprintf("market ticker period interval check, interval(s) =", interval)
+		// 			internal.PrintDebugLogToFile(logInfo)
+		// 		}
+		// 		time.Sleep(100 * time.Second)
+		// 	}
+		// }
 	}
 }

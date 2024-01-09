@@ -48,14 +48,14 @@ func GetInstruments(req *http.Request, instrument map[string]*InstrumentsDetail)
 		request_url := req.URL.Query()
 		request_url.Add("instType", inst_type[i])
 		req.URL.RawQuery = request_url.Encode()
-		fmt.Println(req.URL.String())
+		// fmt.Println(req.URL.String())
 
 		client := &http.Client{}
 		resp, _ := client.Do(req)
 
 		defer resp.Body.Close()
 		body, _ := ioutil.ReadAll(resp.Body)
-		//fmt.Println(string(body))
+		// fmt.Println(string(body))
 
 		var instrumentInfo InstrumentsInfo
 		err := json.Unmarshal(body, &instrumentInfo)

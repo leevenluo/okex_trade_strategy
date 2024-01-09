@@ -81,6 +81,11 @@ const (
 	// GetInstruments
 	GET_INSTRUMENTS_UNMARSHAL_RSP_ERROR = "210"
 	GET_INSTRUMENTS_POST_RSP_ERROR      = "211"
+
+	// GetAccountPosition
+	GET_ACCOUNT_POSITION_UNMARSHAL_RSP_ERROR = "220"
+	GET_ACCOUNT_POSITION_POST_RSP_ERROR      = "221"
+	GET_ACCOUNT_POSITION_POST_DATA_ERROR     = "222"
 )
 
 // InitUserEnv 初始化用户访问参数
@@ -174,6 +179,7 @@ func TimeIntervalSuccess(last_time *int64, interval int64, use_type int) (status
 	}
 }
 
+// 打印Debug日志
 func PrintDebugLogToFile(log string) {
 	t := time.Now()
 	currentTime := fmt.Sprintf("%d-%d-%d %d:%d:%d",
@@ -212,6 +218,108 @@ func PrintDebugLogToFile(log string) {
 		file = file[strings.LastIndex(file, "/")+1:]
 		log = fmt.Sprintf("%s|%s|%s|%d|%s|%s\n",
 			currentTime, runtime.FuncForPC(pc).Name(), file, line, "DEBUG", log)
+	} else {
+		fmt.Println("runtime.Caller error")
+	}
+
+	// 写入文件
+	_, err = f.WriteString(log)
+	if err != nil {
+		fmt.Println("write file error", err.Error())
+		return
+	}
+}
+
+// 打印交易日志
+func PrintTradeLogToFile(log string) {
+	t := time.Now()
+	currentTime := fmt.Sprintf("%d-%d-%d %d:%d:%d",
+		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+
+	// 检查目录是否存在，不存在则创建
+	dirPath := "/home/lighthouse/leeven/okex_trade_strategy/log/"
+	_, err := os.Stat(dirPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err := os.Mkdir(dirPath, os.ModePerm)
+			if err != nil {
+				fmt.Println("create log dir error", err.Error())
+				return
+			}
+		} else {
+			fmt.Println("check log dir error", err.Error())
+			return
+		}
+	}
+
+	// 打开文件,文件名前缀为时间戳
+	today := time.Now().Format("2006-01-02")
+	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "DEBUG")
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Println("open file error", err.Error())
+		return
+	}
+	defer f.Close()
+
+	// 在日志前面加上文件名和行号
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		// file绝对路径截取最后一个/后面的内容
+		file = file[strings.LastIndex(file, "/")+1:]
+		log = fmt.Sprintf("%s|%s|%s|%d|%s|%s\n",
+			currentTime, runtime.FuncForPC(pc).Name(), file, line, "TRADE", log)
+	} else {
+		fmt.Println("runtime.Caller error")
+	}
+
+	// 写入文件
+	_, err = f.WriteString(log)
+	if err != nil {
+		fmt.Println("write file error", err.Error())
+		return
+	}
+}
+
+// 打印主动调整止损线和平仓日志
+func PrintTradeCPLogToFile(log string) {
+	t := time.Now()
+	currentTime := fmt.Sprintf("%d-%d-%d %d:%d:%d",
+		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
+
+	// 检查目录是否存在，不存在则创建
+	dirPath := "/home/lighthouse/leeven/okex_trade_strategy/log/"
+	_, err := os.Stat(dirPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err := os.Mkdir(dirPath, os.ModePerm)
+			if err != nil {
+				fmt.Println("create log dir error", err.Error())
+				return
+			}
+		} else {
+			fmt.Println("check log dir error", err.Error())
+			return
+		}
+	}
+
+	// 打开文件,文件名前缀为时间戳
+	today := time.Now().Format("2006-01-02")
+	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "DEBUG")
+	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	if err != nil {
+		fmt.Println("open file error", err.Error())
+		return
+	}
+	defer f.Close()
+
+	// 在日志前面加上文件名和行号
+	pc, file, line, ok := runtime.Caller(1)
+	if ok {
+		// file绝对路径截取最后一个/后面的内容
+		file = file[strings.LastIndex(file, "/")+1:]
+		log = fmt.Sprintf("%s|%s|%s|%d|%s|%s\n",
+			currentTime, runtime.FuncForPC(pc).Name(), file, line, "TRADE_CP", log)
 	} else {
 		fmt.Println("runtime.Caller error")
 	}
