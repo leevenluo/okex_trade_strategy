@@ -83,7 +83,7 @@ func GetMarketTickers(req *http.Request) ([]ProductList, string) {
 		}
 	}
 
-	logInfo := fmt.Sprintf("len productList :", len(productList))
+	logInfo := fmt.Sprintf("len productList: %d", len(productList))
 	internal.PrintDebugLogToFile(logInfo)
 	//fmt.Println(unvalidSwapTicker)
 

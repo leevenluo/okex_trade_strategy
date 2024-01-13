@@ -204,6 +204,6 @@ func getPeriodCandlesBatch(period string, limitCounts string, instId string) (Ge
 	}
 
 	logInfo := fmt.Sprintf("getPeriodCandles.Data counts: %d, new counts: %d", len(getCandlesRsp.Data), len(getCandlesWrapRsp.Data))
-	fmt.Println(logInfo)
+	internal.PrintDebugLogToFile(logInfo)
 	return getCandlesWrapRsp, internal.RETURN_SUCCESS
 }

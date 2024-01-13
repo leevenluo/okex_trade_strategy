@@ -18,12 +18,18 @@ func JudgeOrderCondition(getCandlesResult GetCandlesResult) bool {
 	K := h - l
 	D := c - o
 
-	n1 := 0.7
+	n1 := 0.3
 
-	logInfo := fmt.Sprintf("K: %f, D: %f, K*n1: %f, D >= K*n1: %t", K, D, K*n1, D >= K*n1)
+	logInfo := fmt.Sprintf("K: %f, D: %f, K*n1: %f, D >= K*n1: %t", K, D, K*n1, D > K*n1)
 	internal.PrintDebugLogToFile(logInfo)
 
-	if D >= K*n1 {
+	if K == 0 || D == 0 {
+		logInfo := fmt.Sprintf("K == 0 || D == 0 exception condition")
+		internal.PrintDebugLogToFile(logInfo)
+		return false
+	}
+
+	if D > K*n1 {
 		return true
 	}
 
@@ -68,7 +74,7 @@ func CalcSLOrderPx(getCandlesResult GetCandlesResult, orderAvgPx string) string 
 
 	n2 := 1.4
 
-	orderSLPx = strconv.FormatFloat(P1-K*n2, 'f', 0, 64)
+	orderSLPx = strconv.FormatFloat(P1-K*n2, 'f', 5, 64)
 
 	logInfo := fmt.Sprintf("K: %f, orderSLPx: %f, orderSLPx: %s", K, P1-K*n2, orderSLPx)
 	internal.PrintDebugLogToFile(logInfo)
@@ -85,12 +91,12 @@ func JudgeSLPrice(marketTicker MarketTicker, currentAvgpx string, get4HCandlesWr
 	P2, _ := strconv.ParseFloat(marketTicker.Last, 10)
 	P1, _ := strconv.ParseFloat(currentAvgpx, 10)
 
-	logInfo := fmt.Sprintf("JudgeSLPrice, K: %f, P1: %f, P2: %f, P2 <= P1+2*K: %t", K, P1, P2, P2 <= P1+2*K)
+	logInfo := fmt.Sprintf("JudgeSLPrice, K: %f, P1: %f, P2: %f, P2 <= P1+2*K: %t", K, P1, P2, P2 >= P1+2*K)
 	internal.PrintDebugLogToFile(logInfo)
 
 	var newSLPrice string
 	if P2 >= P1+2*K {
-		newSLPrice = strconv.FormatFloat(P1+0.2*K, 'f', 0, 64)
+		newSLPrice = strconv.FormatFloat(P1+0.2*K, 'f', 5, 64)
 		return true, newSLPrice
 	}
 
@@ -118,7 +124,7 @@ func JudgeClosePosition(get15mCandlesWrapBatchRsp GetCandlesWrapRsp) bool {
 
 	ATP20 := (totalHSum - totalLSum) / 20
 
-	n3 := 0.2
+	n3 := 1.2
 
 	logInfo := fmt.Sprintf("JudgeClosePosition, c: %f, o: %f, D: %f, ATP20: %f, math.Abs(D) >= ATP20*n3: %t", c, o, D, ATP20, math.Abs(D) >= ATP20*n3)
 	internal.PrintDebugLogToFile(logInfo)

@@ -86,6 +86,18 @@ const (
 	GET_ACCOUNT_POSITION_UNMARSHAL_RSP_ERROR = "220"
 	GET_ACCOUNT_POSITION_POST_RSP_ERROR      = "221"
 	GET_ACCOUNT_POSITION_POST_DATA_ERROR     = "222"
+
+	// GetAccountPosition
+	GET_ACCOUNT_POSITION_HISTORY_UNMARSHAL_RSP_ERROR = "230"
+	GET_ACCOUNT_POSITION_HISTORY_POST_RSP_ERROR      = "231"
+	GET_ACCOUNT_POSITION_HISTORY_POST_DATA_ERROR     = "232"
+
+	// CalcTradeProfit
+	CALC_TRADE_PROFIT_UNMARSHAL_RSP_ERROR  = "240"
+	CALC_TRADE_PROFIT_POST_RSP_ERROR       = "241"
+	CALC_TRADE_PROFIT_POST_DATA_ERROR      = "242"
+	CALC_TRADE_PROFIT_DATA_SELL_TIME_ERROR = "243"
+	CALC_TRADE_PROFIT_DATA_SIDE_TYPE_ERROR = "244"
 )
 
 // InitUserEnv 初始化用户访问参数
@@ -254,7 +266,7 @@ func PrintTradeLogToFile(log string) {
 
 	// 打开文件,文件名前缀为时间戳
 	today := time.Now().Format("2006-01-02")
-	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "DEBUG")
+	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "TRADE")
 	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("open file error", err.Error())
@@ -268,7 +280,7 @@ func PrintTradeLogToFile(log string) {
 		// file绝对路径截取最后一个/后面的内容
 		file = file[strings.LastIndex(file, "/")+1:]
 		log = fmt.Sprintf("%s|%s|%s|%d|%s|%s\n",
-			currentTime, runtime.FuncForPC(pc).Name(), file, line, "TRADE", log)
+			currentTime, runtime.FuncForPC(pc).Name(), file, line, "DEBUG", log)
 	} else {
 		fmt.Println("runtime.Caller error")
 	}
@@ -305,7 +317,7 @@ func PrintTradeCPLogToFile(log string) {
 
 	// 打开文件,文件名前缀为时间戳
 	today := time.Now().Format("2006-01-02")
-	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "DEBUG")
+	fileName := dirPath + fmt.Sprintf("%s_%s.log", today, "TRADE_CP")
 	f, err := os.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Println("open file error", err.Error())
@@ -319,7 +331,7 @@ func PrintTradeCPLogToFile(log string) {
 		// file绝对路径截取最后一个/后面的内容
 		file = file[strings.LastIndex(file, "/")+1:]
 		log = fmt.Sprintf("%s|%s|%s|%d|%s|%s\n",
-			currentTime, runtime.FuncForPC(pc).Name(), file, line, "TRADE_CP", log)
+			currentTime, runtime.FuncForPC(pc).Name(), file, line, "DEBUG", log)
 	} else {
 		fmt.Println("runtime.Caller error")
 	}

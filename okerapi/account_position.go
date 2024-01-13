@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 	"trade_strategy/internal"
 )
@@ -34,6 +35,7 @@ func CheckAccountPositions() {
 
 		// 遍历持仓产品
 		for _, eachCase := range accountPositionList {
+			time.Sleep(1 * time.Second)
 			// 产品没有止损单，打印异常信息后退出
 			if len(eachCase.CloseOrderAlgoList) < 1 {
 				logInfo := fmt.Sprintf("No CloseOrderAlgoList err: %s", eachCase.InstId)
@@ -80,11 +82,13 @@ func CheckAccountPositions() {
 				}
 
 				// 计算盈亏金额
-				// ret = CalcTradeResult()
+				ret = CalcTradeProfit(eachCase.InstId)
+				if ret != internal.RETURN_SUCCESS {
+					logInfo := fmt.Sprintf("CalcTradeProfit err: %s", ret)
+					internal.PrintDebugLogToFile(logInfo)
+					continue
+				}
 			}
-
-
-			time.Sleep(1 * time.Second)
 		}
 
 		// 周期判断轮询
@@ -349,4 +353,92 @@ func ClosePosition(accountPosition AccountPosition) string {
 	internal.PrintTradeLogToFile(logTradeInfo)
 
 	return internal.RETURN_SUCCESS
+}
+
+type TradeFills struct {
+	InstId   string `json:"instId"`
+	Side     string `json:"side"`
+	Fee      string `json:"fee"`
+	FillPnl  string `json:"fillPnl"`
+	FillTime string `json:"fillTime"`
+}
+
+type TradeFillsRsp struct {
+	Code string       `json:"code"`
+	Msg  string       `json:"msg"`
+	Data []TradeFills `json:"data"`
+}
+
+// 计算盈亏金额
+func CalcTradeProfit(instId string) string {
+	// 先睡眠10s再算平仓收益，正式环境换成3s
+	time.Sleep(10 * time.Second)
+	req, _ := http.NewRequest("GET", internal.ROOT_PATH, nil)
+	accountPostionPath := "/api/v5/trade/fills"
+
+	req.URL.Path = accountPostionPath
+	request_url := req.URL.Query()
+	request_url.Add("instType", "SWAP")
+	request_url.Add("instId", instId)
+	request_url.Add("limit", "2")
+	req.URL.RawQuery = request_url.Encode()
+
+	pathUrl := accountPostionPath + "?" + req.URL.RawQuery
+	req = internal.InitUserEnv(pathUrl)
+	req.URL.Path = accountPostionPath
+	req.URL.RawQuery = request_url.Encode()
+
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	// fmt.Println(string(body))
+	var tradeFillsRsp TradeFillsRsp
+	err := json.Unmarshal(body, &tradeFillsRsp)
+	if err != nil {
+		logInfo := fmt.Sprintf("CalcTradeProfit Unmarshal err: %s", err.Error())
+		internal.PrintDebugLogToFile(logInfo)
+		return internal.CALC_TRADE_PROFIT_UNMARSHAL_RSP_ERROR
+	}
+
+	if tradeFillsRsp.Code != internal.RETURN_SUCCESS {
+		logInfo := fmt.Sprintf("CalcTradeProfit err, code: %s, msg: %s", tradeFillsRsp.Code, tradeFillsRsp.Msg)
+		internal.PrintDebugLogToFile(logInfo)
+		return internal.CALC_TRADE_PROFIT_POST_RSP_ERROR
+	}
+
+	if len(tradeFillsRsp.Data) != 2 {
+		logInfo := fmt.Sprintf("tradeFillsRsp.Data counts exp: %d", len(tradeFillsRsp.Data))
+		internal.PrintDebugLogToFile(logInfo)
+		return internal.CALC_TRADE_PROFIT_POST_DATA_ERROR
+	}
+
+	// 通过最近sell平仓，次新bug建仓，且sell的成交时间小于1分钟，认为平仓收益计算符合逻辑
+	unixTimestampMillis, _ := strconv.ParseInt(tradeFillsRsp.Data[0].FillTime, 10, 64)
+	unixTimestamp := time.Unix(0, unixTimestampMillis*int64(time.Millisecond))
+	oneMinuteAgo := time.Now().Add(-1 * time.Minute)
+	if unixTimestamp.Before(oneMinuteAgo) {
+		sellTimeformat := unixTimestamp.Format("2006-01-02 15:04:05")
+		logInfo := fmt.Sprintf("tradeFillsRsp.Data[0] fillTime exp: unixTimestamp.Before(oneMinuteAgo) %s", sellTimeformat)
+		internal.PrintDebugLogToFile(logInfo)
+		return internal.CALC_TRADE_PROFIT_DATA_SELL_TIME_ERROR
+	}
+
+	if tradeFillsRsp.Data[0].Side == "sell" && tradeFillsRsp.Data[1].Side == "buy" {
+		sellProfit, _ := strconv.ParseFloat(tradeFillsRsp.Data[0].FillPnl, 10)
+		sellFee, _ := strconv.ParseFloat(tradeFillsRsp.Data[0].Fee, 10)
+		BuyFee, _ := strconv.ParseFloat(tradeFillsRsp.Data[1].Fee, 10)
+
+		totalProfit := sellProfit + sellFee + BuyFee
+		logTradeInfo := fmt.Sprintf("%s|CLOSE POSITION PROFIT: %f, %f, %f, %f", instId, totalProfit, sellProfit, sellFee, BuyFee)
+		internal.PrintTradeLogToFile(logTradeInfo)
+
+		return internal.RETURN_SUCCESS
+	}
+
+	logInfo := fmt.Sprintf("tradeFillsRsp.Data %s side exp: %s, %s", instId, tradeFillsRsp.Data[0].Side, tradeFillsRsp.Data[1].Side)
+	internal.PrintDebugLogToFile(logInfo)
+	return internal.CALC_TRADE_PROFIT_DATA_SIDE_TYPE_ERROR
 }

@@ -45,6 +45,7 @@ func main() {
 
 		// 遍历每个产品确认交易逻辑
 		for _, eachInstId := range productList {
+			time.Sleep(1 * time.Second)
 			// 获取产品对应的K线
 			getCandlesResult, ret := okerapi.GetCandles(eachInstId.InstId)
 			if ret != internal.RETURN_SUCCESS {
@@ -57,6 +58,15 @@ func main() {
 			status := okerapi.JudgeOrderCondition(*getCandlesResult)
 			if status {
 				// 开仓
+
+				// 已经开仓过的产品，平仓前不再开仓，以及平仓后4H周期内也不再开仓
+				tradeCondition := okerapi.JudgeTradeCondition(getCandlesResult.InstId)
+				if !tradeCondition {
+					logInfo := fmt.Sprintf("okerapi.JudgeTradeCondition err: %s", ret)
+					internal.PrintDebugLogToFile(logInfo)
+					continue
+				}
+
 				// 开仓数量计算
 				_ = okerapi.CalcOrderCounts(*getCandlesResult)
 				ordId, ret := okerapi.TradeOrder(eachInstId.InstId, "1", "100")
@@ -92,8 +102,6 @@ func main() {
 				logInfo := fmt.Sprintf("%s order: %t", eachInstId.InstId, status)
 				internal.PrintDebugLogToFile(logInfo)
 			}
-
-			time.Sleep(1 * time.Second)
 		}
 
 		// 周期判断轮询

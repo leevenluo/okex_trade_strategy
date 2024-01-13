@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"time"
 	"trade_strategy/internal"
 )
 
@@ -102,6 +104,9 @@ func TradeOrder(instid string, orderType string, orderSz string) (string, string
 	logTradeInfo := fmt.Sprintf("%s|%s|BUY LONG SUCCESS", instid, ordId)
 	internal.PrintTradeLogToFile(logTradeInfo)
 
+	// 睡眠等待3秒成交，模拟盘10秒
+	time.Sleep(10 * time.Second)
+
 	return ordId, internal.RETURN_SUCCESS
 }
 
@@ -172,6 +177,9 @@ func GetOrderInfoOfAvgPx(instId string, ordId string) (string, string) {
 	if orderDetailRsp.Data[0].State != "filled" {
 		logInfo := fmt.Sprintf("orderDetailRsp.Data[0].State != filled: %s", orderDetailRsp.Data[0].State)
 		internal.PrintDebugLogToFile(logInfo)
+
+		logTradeInfo := fmt.Sprintf("%s|%s|BUY FAIL", instId, orderDetailRsp.Data[0].State)
+		internal.PrintTradeLogToFile(logTradeInfo)
 		return avgPx, internal.GET_ORDER_INFO_POST_DATA_STATE_ERROR
 	}
 
@@ -261,4 +269,134 @@ func TradeSLOrder(instid string, orderPrice string, orderCounts string) string {
 	internal.PrintTradeLogToFile(logTradeInfo)
 
 	return internal.RETURN_SUCCESS
+}
+
+// 已经开仓过的产品，平仓前不再开仓，以及4H周期内也不再开仓
+func JudgeTradeCondition(instId string) bool {
+	// 拉取持仓信息
+	accountPositionList, ret := GetAccountPosition()
+	if ret == internal.GET_ACCOUNT_POSITION_UNMARSHAL_RSP_ERROR || ret == internal.GET_ACCOUNT_POSITION_POST_RSP_ERROR {
+		logInfo := fmt.Sprintf("GetAccountPosition err: %s", ret)
+		internal.PrintDebugLogToFile(logInfo)
+		return false
+	}
+
+	// 持仓超过20个，不再开仓
+	if len(accountPositionList) >= 3 {
+		logInfo := fmt.Sprintf("JudgeTradeCondition false:len(accountPositionList) >= 3")
+		internal.PrintDebugLogToFile(logInfo)
+		return false
+	}
+
+	// 在开仓列表不再重复开仓
+	for _, eachCase := range accountPositionList {
+		if eachCase.InstId == instId {
+			logInfo := fmt.Sprintf("JudgeTradeCondition false:eachCase.InstId == instId")
+			internal.PrintDebugLogToFile(logInfo)
+			return false
+		}
+	}
+
+	// 拉取历史持仓信息
+	accountPositionHistoryList, ret := GetAccountPositionHistory()
+	if ret == internal.GET_ACCOUNT_POSITION_HISTORY_UNMARSHAL_RSP_ERROR || ret == internal.GET_ACCOUNT_POSITION_HISTORY_POST_RSP_ERROR {
+		logInfo := fmt.Sprintf("GetAccountPositionHistory err: %s", ret)
+		internal.PrintDebugLogToFile(logInfo)
+		return false
+	}
+
+	// 拉取间隔1次/10
+	logInfo := fmt.Sprintf("GetAccountPositionHistory wait time.Sleep(10 * time.Second): %d", len(accountPositionHistoryList))
+	internal.PrintDebugLogToFile(logInfo)
+	time.Sleep(10 * time.Second)
+
+	// 4H周期内也不再开仓
+	for _, eachCase := range accountPositionHistoryList {
+		if eachCase.InstId == instId {
+			logInfo := fmt.Sprintf("JudgeTradeCondition 4H false:eachCase.InstId == instId")
+			internal.PrintDebugLogToFile(logInfo)
+			return false
+		}
+	}
+
+	return true
+}
+
+type AccountPositionHistory struct {
+	InstId string `json:"instId"`
+	CTime  string `json:"cTime"`
+	UTime  string `json:"uTime"`
+}
+
+type AccountPositionHistoryRsp struct {
+	Code string                   `json:"code"`
+	Msg  string                   `json:"msg"`
+	Data []AccountPositionHistory `json:"data"`
+}
+
+func GetAccountPositionHistory() ([]AccountPositionHistory, string) {
+	var accountPositionHistoryList []AccountPositionHistory
+	req, _ := http.NewRequest("GET", internal.ROOT_PATH, nil)
+	accountPostionPath := "/api/v5/account/positions-history"
+
+	// 四个小时前
+	tNow := time.Now()
+	tNowBefore4H := tNow.Add(-1 * time.Hour)
+	before4H := strconv.FormatInt(tNowBefore4H.UnixNano()/int64(time.Millisecond), 10)
+
+	req.URL.Path = accountPostionPath
+	request_url := req.URL.Query()
+	request_url.Add("instType", "SWAP")
+	request_url.Add("before", before4H)
+	// request_url.Add("limit", "1")
+	req.URL.RawQuery = request_url.Encode()
+
+	pathUrl := accountPostionPath + "?" + req.URL.RawQuery
+	req = internal.InitUserEnv(pathUrl)
+	req.URL.Path = accountPostionPath
+	req.URL.RawQuery = request_url.Encode()
+
+	client := &http.Client{}
+	resp, _ := client.Do(req)
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	// fmt.Println(string(body))
+	var accountPositionHistoryRsp AccountPositionHistoryRsp
+	err := json.Unmarshal(body, &accountPositionHistoryRsp)
+	if err != nil {
+		logInfo := fmt.Sprintf("CheckAccountPositionsHistory Unmarshal err: %s", err.Error())
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionHistoryList, internal.GET_ACCOUNT_POSITION_HISTORY_UNMARSHAL_RSP_ERROR
+	}
+
+	if accountPositionHistoryRsp.Code != internal.RETURN_SUCCESS {
+		logInfo := fmt.Sprintf("CheckAccountPositionsHistory err, code: %s, msg: %s", accountPositionHistoryRsp.Code, accountPositionHistoryRsp.Msg)
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionHistoryList, internal.GET_ACCOUNT_POSITION_HISTORY_POST_RSP_ERROR
+	}
+
+	// 开仓数量逻辑上和止损策略单数量一样，不过考虑非事务一致关系，只对不一致的产品做日志输出
+	if len(accountPositionHistoryRsp.Data) < 1 {
+		logInfo := fmt.Sprintf("len(accountPositionHistoryRsp.Data) < 1: %d", len(accountPositionHistoryRsp.Data))
+		internal.PrintDebugLogToFile(logInfo)
+		return accountPositionHistoryList, internal.GET_ACCOUNT_POSITION_HISTORY_POST_DATA_ERROR
+	}
+
+	accountPositionHistoryList = accountPositionHistoryRsp.Data
+
+	// unixTime, _ := strconv.ParseInt(accountPositionHistoryList[len(accountPositionHistoryRsp.Data)-1].CTime, 10, 64)
+	// unixTimeTmType := time.Unix(0, unixTime*int64(time.Millisecond))
+	// cTimeformat := unixTimeTmType.Format("2006-01-02 15:04:05")
+
+	// unixTime, _ = strconv.ParseInt(accountPositionHistoryList[len(accountPositionHistoryRsp.Data)-1].UTime, 10, 64)
+	// unixTimeTmType = time.Unix(0, unixTime*int64(time.Millisecond))
+	// uTimeformat := unixTimeTmType.Format("2006-01-02 15:04:05")
+
+	// tempInstId := accountPositionHistoryList[len(accountPositionHistoryRsp.Data)-1].InstId
+	// logInfo := fmt.Sprintf("len(accountPositionHistoryRsp.Data):%d, %s, %s, %s", len(accountPositionHistoryRsp.Data), tempInstId, cTimeformat, uTimeformat)
+	// internal.PrintDebugLogToFile(logInfo)
+
+	return accountPositionHistoryList, internal.RETURN_SUCCESS
 }
